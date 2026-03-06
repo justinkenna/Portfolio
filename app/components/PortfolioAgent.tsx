@@ -14,10 +14,15 @@ export default function PortfolioAgent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const hasStarted = messages.length > 0 || loading;
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
   }, [messages, loading]);
 
   const ask = async (question: string) => {
@@ -64,8 +69,23 @@ export default function PortfolioAgent() {
       : INITIAL_PROMPTS;
 
   return (
-    <section className="bg-[#f6ece1] px-8 py-20 md:px-16">
-      <div className="max-w-2xl mx-auto">
+    <section
+      className="bg-[#f6ece1] px-8 py-20 md:px-16"
+      style={{
+        minHeight: hasStarted ? "712px" : undefined,
+        transition: "min-height 0.5s ease-in-out",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        className="max-w-2xl mx-auto w-full"
+        style={{
+          flex: hasStarted ? "1" : undefined,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
 
         {/* Header */}
         <p className="text-xs font-bold tracking-widest uppercase text-[#fe6500] mb-3">
@@ -79,40 +99,61 @@ export default function PortfolioAgent() {
           This AI assistant is trained on my work and can help you explore my portfolio.
         </p>
 
-        {/* Chat window — only visible after first message */}
-        {messages.length > 0 && (
-          <div className="mb-6 flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-1">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
+        {/* Chat area — expands when conversation starts */}
+        <div
+          className="relative"
+          style={{ flex: hasStarted ? "1" : undefined, overflow: "hidden" }}
+        >
+          {/* Gradient: fades top edge as messages scroll up */}
+          {hasStarted && (
+            <div className="absolute top-0 left-0 right-0 h-14 bg-gradient-to-b from-[#f6ece1] to-transparent z-10 pointer-events-none" />
+          )}
+
+          {/* Scroll container — absolutely fills the chat area */}
+          <div
+            ref={scrollContainerRef}
+            style={{
+              position: "absolute",
+              inset: 0,
+              overflowY: hasStarted ? "auto" : "hidden",
+              display: "flex",
+              flexDirection: "column",
+              scrollbarWidth: "none",
+            }}
+            className="[&::-webkit-scrollbar]:hidden"
+          >
+            {/* mt-auto pushes messages to bottom; new ones push old ones up */}
+            <div className="flex flex-col gap-4 mt-auto pt-14 pb-4 pr-1">
+              {messages.map((msg, i) => (
                 <div
-                  className={`max-w-[85%] px-4 py-3 text-sm leading-6 rounded-2xl ${
-                    msg.role === "user"
-                      ? "bg-black text-white rounded-br-sm"
-                      : "bg-white text-black shadow-sm rounded-bl-sm"
-                  }`}
+                  key={i}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {msg.content}
+                  <div
+                    className={`max-w-[85%] px-4 py-3 text-sm leading-6 rounded-2xl ${
+                      msg.role === "user"
+                        ? "bg-black text-white rounded-br-sm"
+                        : "bg-white text-black font-semibold shadow-sm rounded-bl-sm"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
-                  <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:0ms]" />
-                  <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:150ms]" />
-                  <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:300ms]" />
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
+                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:0ms]" />
+                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:300ms]" />
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={bottomRef} />
+              )}
+              <div ref={bottomRef} />
+            </div>
           </div>
-        )}
-
-        {/* Suggested prompts */}
+        </div>
 
         {/* Input */}
         <form onSubmit={handleSubmit} className="flex gap-3">
@@ -139,7 +180,7 @@ export default function PortfolioAgent() {
               <button
                 key={prompt}
                 onClick={() => ask(prompt)}
-                className="text-xs font-medium px-4 py-2 rounded-full border border-black/20 text-black/70 hover:border-[#fe6500] hover:text-[#fe6500] transition-colors bg-white/60"
+                className="text-xs font-medium px-4 py-2 rounded-full border border-black/20 text-black/70 hover:border-[#fe6500] hover:text-[#fe6500] transition-colors"
               >
                 {prompt}
               </button>
