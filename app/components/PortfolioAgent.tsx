@@ -73,7 +73,7 @@ export default function PortfolioAgent() {
       className="bg-[#f6ece1] px-8 py-20 md:px-16"
       style={{
         minHeight: hasStarted ? "712px" : undefined,
-        transition: "min-height 0.5s ease-in-out",
+        transition: "min-height 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -88,9 +88,20 @@ export default function PortfolioAgent() {
       >
 
         {/* Header */}
-        <p className="text-xs font-bold tracking-widest uppercase text-[#fe6500] mb-3">
-          Explore My Work
-        </p>
+        <div className="flex items-start justify-between mb-3">
+          <p className="text-xs font-bold tracking-widest uppercase text-[#fe6500]">
+            Explore My Work
+          </p>
+          {hasStarted && (
+            <button
+              onClick={() => { setMessages([]); setInput(""); }}
+              aria-label="Close chat"
+              className="text-2xl font-medium text-black/40 hover:text-black transition-colors leading-none"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-2">
           Explore My Work With an <span className="text-[#fe6500]">AI Agent</span>
         </h2>
@@ -102,7 +113,11 @@ export default function PortfolioAgent() {
         {/* Chat area — expands when conversation starts */}
         <div
           className="relative"
-          style={{ flex: hasStarted ? "1" : undefined, overflow: "hidden" }}
+          style={{
+            height: hasStarted ? "380px" : "0px",
+            transition: "height 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
+            overflow: "hidden",
+          }}
         >
           {/* Gradient: fades top edge as messages scroll up */}
           {hasStarted && (
@@ -129,15 +144,15 @@ export default function PortfolioAgent() {
                   key={i}
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <div
-                    className={`max-w-[85%] px-4 py-3 text-sm leading-6 rounded-2xl ${
-                      msg.role === "user"
-                        ? "bg-black text-white rounded-br-sm"
-                        : "bg-white text-black font-semibold shadow-sm rounded-bl-sm"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
+                  {msg.role === "user" ? (
+                    <div className="max-w-[85%] px-4 py-3 text-sm leading-6 rounded-2xl bg-black text-white rounded-br-sm">
+                      {msg.content}
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-7 font-bold text-black/80 max-w-[90%]">
+                      {msg.content}
+                    </p>
+                  )}
                 </div>
               ))}
 
@@ -175,7 +190,7 @@ export default function PortfolioAgent() {
         </form>
 
         {!loading && lastSuggestions.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-3 mt-4">
             {lastSuggestions.map((prompt) => (
               <button
                 key={prompt}

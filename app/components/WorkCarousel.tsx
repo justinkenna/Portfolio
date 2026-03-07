@@ -90,20 +90,23 @@ export default function WorkCarousel() {
   const handleScroll = () => {
     if (isProgrammaticScroll.current || !trackRef.current) return;
     const track = trackRef.current;
-    const center = track.scrollLeft + track.clientWidth / 2;
-    let closest = 0;
+    const groupSize = 3;
+    const numGroups = Math.ceil(CARDS.length / groupSize);
+    let closestGroup = 0;
     let minDist = Infinity;
-    Array.from(track.children).forEach((child, i) => {
-      const el = child as HTMLElement;
-      const dist = Math.abs(el.offsetLeft + el.clientWidth / 2 - center);
-      if (dist < minDist) { minDist = dist; closest = i; }
-    });
-    activeRef.current = closest;
-    setActive(closest);
+    for (let g = 0; g < numGroups; g++) {
+      const idx = g * groupSize;
+      const el = track.children[idx] as HTMLElement;
+      const dist = Math.abs(el.offsetLeft - track.scrollLeft);
+      if (dist < minDist) { minDist = dist; closestGroup = g; }
+    }
+    const snappedIndex = closestGroup * groupSize;
+    activeRef.current = snappedIndex;
+    setActive(snappedIndex);
   };
 
   const prev = () => scrollTo(Math.max(0, activeRef.current - 3));
-  const next = () => scrollTo(Math.min(CARDS.length - 1, activeRef.current + 3));
+  const next = () => scrollTo(Math.min(CARDS.length - 3, activeRef.current + 3));
 
   return (
     <section className="bg-black py-12 px-8 md:px-16" id="work">
@@ -117,8 +120,8 @@ export default function WorkCarousel() {
           Selected Work
         </h2>
 
-        {/* Carousel wrapper — position relative for the floating arrow buttons */}
-        <div className="relative">
+        {/* Carousel wrapper — capped at 3-card width so right arrow aligns with last card */}
+        <div className="relative max-w-[1008px]">
 
           {/* Left arrow — centered vertically on the card image area */}
           <div className="absolute left-0 top-[45%] -translate-y-1/2 -translate-x-1/2 z-10">
@@ -157,7 +160,7 @@ export default function WorkCarousel() {
 
           {/* Right arrow */}
           <div className="absolute right-0 top-[45%] -translate-y-1/2 translate-x-1/2 z-10">
-            <ArrowButton direction="right" onClick={next} disabled={active === CARDS.length - 1} />
+            <ArrowButton direction="right" onClick={next} disabled={active >= CARDS.length - 3} />
           </div>
 
         </div>
