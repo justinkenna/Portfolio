@@ -41,26 +41,26 @@ export default function ScrollArrow() {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="flex justify-center bg-black -mt-40">
+    <div ref={wrapperRef} className="flex justify-center bg-black py-2">
       <svg
-        width="70"
-        height="160"
-        viewBox="0 0 70 160"
+        width="36"
+        height="80"
+        viewBox="0 0 36 80"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           ref={pathRef}
-          d="M 35 0 C 65 32 5 64 35 100 C 58 124 35 138 35 148"
+          d="M 18 0 C 33 16 3 32 18 50 C 29 62 18 69 18 74"
           stroke="#fe6500"
-          strokeWidth="2.5"
+          strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           ref={chevronRef}
-          d="M 23 140 L 35 156 L 47 140"
+          d="M 10 68 L 18 78 L 26 68"
           stroke="#fe6500"
-          strokeWidth="2.5"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"

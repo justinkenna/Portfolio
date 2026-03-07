@@ -102,10 +102,10 @@ export default function PortfolioAgent() {
             </button>
           )}
         </div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-2">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-6">
           Explore My Work With an <span className="text-[#fe6500]">AI Agent</span>
         </h2>
-        <p className="text-sm text-black/50 mb-8">
+        <p className="text-sm text-black/80 mb-8">
           Ask questions about my projects, design approach, or experience.<br />
           This AI assistant is trained on my work and can help you explore my portfolio.
         </p>
@@ -171,14 +171,14 @@ export default function PortfolioAgent() {
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="flex gap-3">
+        <form onSubmit={handleSubmit} className="flex gap-3 -ml-5">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about my work in AI, search, or monetization…"
             disabled={loading}
-            className="flex-1 rounded-full bg-white border border-black/10 px-5 py-3 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-[#fe6500] disabled:opacity-50"
+            className="flex-1 rounded-full bg-white/80 border border-black/10 px-5 py-3 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-[#fe6500] disabled:opacity-50"
           />
           <button
             type="submit"
@@ -190,7 +190,7 @@ export default function PortfolioAgent() {
         </form>
 
         {!loading && lastSuggestions.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-4">
+          <div className="flex flex-wrap gap-3 mt-8 -ml-4">
             {lastSuggestions.map((prompt) => (
               <button
                 key={prompt}
