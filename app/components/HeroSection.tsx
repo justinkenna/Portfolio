@@ -11,18 +11,73 @@ const NAV_ITEMS = [
 
 export default function HeroSection() {
   const imgRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const scrollYRef = useRef(0);
+  const mouseOffsetRef = useRef({ x: 0, y: 0 });
   const [open, setOpen] = useState(false);
+
+  const applyTransform = () => {
+    if (!imgRef.current) return;
+    const { x, y } = mouseOffsetRef.current;
+    imgRef.current.style.transform =
+      `translateY(${scrollYRef.current}px) translate(${x}px, ${y}px)`;
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!imgRef.current) return;
-      imgRef.current.style.transform = `translateY(${window.scrollY * 0.45}px)`;
+      scrollYRef.current = window.scrollY * 0.45;
+      applyTransform();
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close on outside click
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const handleMouse = (e: MouseEvent) => {
+      const rect = section.getBoundingClientRect();
+      // Normalize cursor to -0.5 → 0.5 within section
+      const nx = (e.clientX - rect.left) / rect.width - 0.5;
+      const ny = (e.clientY - rect.top) / rect.height - 0.5;
+      // Move image subtly opposite to cursor (max ±12px)
+      mouseOffsetRef.current = { x: nx * -12, y: ny * -12 };
+      applyTransform();
+    };
+    const handleLeave = () => {
+      // Smoothly return to center on mouse leave
+      mouseOffsetRef.current = { x: 0, y: 0 };
+      if (imgRef.current) {
+        imgRef.current.style.transition = "transform 0.6s ease";
+        applyTransform();
+        setTimeout(() => {
+          if (imgRef.current) imgRef.current.style.transition = "";
+        }, 600);
+      }
+    };
+    section.addEventListener("mousemove", handleMouse);
+    section.addEventListener("mouseleave", handleLeave);
+    return () => {
+      section.removeEventListener("mousemove", handleMouse);
+      section.removeEventListener("mouseleave", handleLeave);
+    };
+  }, []);
+
+  const textRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-linked gap: subtitle stays fixed, only CTA gap compresses
+  useEffect(() => {
+    const updateGaps = () => {
+      if (!textRef.current) return;
+      const progress = Math.min(1, window.scrollY / 300);
+      // CTA: 56px → 32px on scroll
+      const ctaGap = 56 - progress * 24;
+      textRef.current.style.setProperty("--gap-cta", `${ctaGap}px`);
+    };
+    window.addEventListener("scroll", updateGaps, { passive: true });
+    updateGaps();
+    return () => window.removeEventListener("scroll", updateGaps);
+  }, []);
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -34,7 +89,7 @@ export default function HeroSection() {
   }, [open]);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section ref={sectionRef} className="relative h-screen w-full overflow-hidden">
 
       {/* Parallax image wrapper */}
       <div
@@ -126,18 +181,24 @@ export default function HeroSection() {
       </nav>
 
       {/* Hero text */}
-      <div className="absolute bottom-20 w-full flex flex-col items-center text-center px-6">
-        <h1 className="text-[clamp(5rem,20vw,12rem)] font-extrabold leading-none tracking-tight text-white">
-          Justin
+      <div ref={textRef} className="absolute bottom-20 w-full flex flex-col items-center text-center px-6">
+        <h1 className="text-[clamp(3rem,11vw,7rem)] font-extrabold leading-none tracking-wide text-[#f6ece1]">
+          Justin Kenna
         </h1>
-        <p className="mt-4 text-lg text-white/80 tracking-wide">
-          UX design&nbsp;•&nbsp;Research&nbsp;•&nbsp;Problem Solver
-        </p>
+        <p className="text-lg text-white/80 tracking-wide" style={{ marginTop: "12px" }}>
+            Product designer focused on AI, search, and monetization systems.
+          </p>
         <a
           href="#work"
-          className="mt-6 inline-block bg-[#fe6500] hover:bg-[#e05a00] transition-colors text-white font-medium px-7 py-3 rounded-full"
+          className="inline-flex items-center gap-3 bg-[#fe6500] hover:bg-[#e05a00] transition-colors text-white font-extrabold pl-6 pr-2 py-2 rounded-full"
+          style={{ marginTop: "var(--gap-cta, 56px)" }}
         >
           View Work
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-white text-[#fe6500]">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
         </a>
       </div>
     </section>
