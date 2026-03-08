@@ -98,7 +98,7 @@ export default function HeroSection() {
         style={{ top: "-20%", bottom: "-20%", left: 0, right: 0 }}
       >
         <Image
-          src="/assets/HomeImage.png"
+          src="/assets/mustafi-numann-iC16OhPB2JE-unsplash.jpg"
           alt="Justin Kenna hero background"
           fill
           priority
@@ -169,7 +169,7 @@ export default function HeroSection() {
               >
                 <a
                   href={item.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => { e.preventDefault(); setOpen(false); document.querySelector(item.href)?.scrollIntoView({ behavior: "smooth" }); }}
                   className="block px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                 >
                   {item.label}
@@ -190,6 +190,7 @@ export default function HeroSection() {
           </p>
         <a
           href="#work"
+          onClick={(e) => { e.preventDefault(); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }}
           className="inline-flex items-center gap-3 bg-[#fe6500] hover:bg-[#e05a00] transition-colors text-white font-extrabold pl-6 pr-2 py-2 rounded-full"
           style={{ marginTop: "var(--gap-cta, 56px)" }}
         >
