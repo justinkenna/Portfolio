@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const NAV_ITEMS = [
   { label: "About", href: "#about" },
   { label: "View Work", href: "#work" },
-  { label: "Case Studies", href: "#case-studies" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function HeroSection() {
@@ -98,16 +98,18 @@ export default function HeroSection() {
         style={{ top: "-20%", bottom: "-20%", left: 0, right: 0 }}
       >
         <Image
-          src="/assets/mustafi-numann-iC16OhPB2JE-unsplash.jpg"
+          src="/assets/JustinHome9.jpg"
           alt="Justin Kenna hero background"
           fill
           priority
+          unoptimized
+          sizes="100vw"
           className="object-cover object-center"
         />
       </div>
 
       {/* Bottom gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black" />
 
       {/* Nav */}
       <nav
