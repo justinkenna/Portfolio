@@ -95,7 +95,7 @@ export default function HeroSection() {
       <div
         ref={imgRef}
         className="absolute inset-0 will-change-transform"
-        style={{ top: "-20%", bottom: "-20%", left: 0, right: 0 }}
+        style={{ top: "-10%", bottom: "-10%", left: 0, right: 0 }}
       >
         <Image
           src="/assets/JustinHome9.jpg"
@@ -199,7 +199,7 @@ export default function HeroSection() {
           View Work
           <span className="flex items-center justify-center w-9 h-9 rounded-full bg-white text-[#fe6500]">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </span>
         </a>

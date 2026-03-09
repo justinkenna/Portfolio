@@ -101,9 +101,9 @@ IMPORTANT INSTRUCTIONS:
 `;
 
 export const INITIAL_PROMPTS = [
-  "What kind of work do you do?",
-  "Tell me about your work at Microsoft",
-  "How do you design monetization systems?",
+  "What kind of work does he do?",
+  "Tell me about his work at Microsoft",
+  "How does he design monetization systems?",
   "Which project should I start with?",
-  "What problems do you enjoy solving?",
+  "What problems does he enjoy solving?",
 ];

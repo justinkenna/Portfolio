@@ -4,18 +4,72 @@ import { useState, useRef, useEffect } from "react";
 import { INITIAL_PROMPTS } from "@/lib/portfolio-context";
 import type { AgentResponse } from "@/app/api/portfolio-agent/route";
 
+const LOADING_PHRASES = [
+  "Pondering...",
+  "Asking Justin...",
+  "Looking over his experience...",
+  "Reviewing his work...",
+  "Checking the details...",
+  "Thinking it over...",
+];
+
 type Message = {
   role: "user" | "assistant";
   content: string;
   suggestions?: string[];
 };
 
+function TypedMessage({ content, animate }: { content: string; animate: boolean }) {
+  const sentences = content.match(/[^.!?]+[.!?]*/g)?.map(s => s.trim()).filter(Boolean) ?? [content];
+  const [visible, setVisible] = useState(animate ? 0 : sentences.length);
+
+  useEffect(() => {
+    if (!animate) return;
+    setVisible(0);
+    let i = 0;
+    const tick = () => {
+      i += 1;
+      setVisible(i);
+      if (i < sentences.length) setTimeout(tick, 120);
+    };
+    setTimeout(tick, 60);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content]);
+
+  return (
+    <p className="text-sm leading-7 font-bold text-black/80 max-w-[90%]">
+      {sentences.map((s, i) => (
+        <span
+          key={i}
+          style={{
+            opacity: i < visible ? 1 : 0,
+            transition: "opacity 0.4s ease",
+            display: "inline",
+          }}
+        >
+          {s}{" "}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 export default function PortfolioAgent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingPhrase, setLoadingPhrase] = useState(LOADING_PHRASES[0]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!loading) return;
+    setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)]);
+    const interval = setInterval(() => {
+      setLoadingPhrase(LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)]);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const hasStarted = messages.length > 0 || loading;
 
@@ -153,20 +207,17 @@ export default function PortfolioAgent() {
                       {msg.content}
                     </div>
                   ) : (
-                    <p className="text-sm leading-7 font-bold text-black/80 max-w-[90%]">
-                      {msg.content}
-                    </p>
+                    <TypedMessage
+                      content={msg.content}
+                      animate={i === messages.length - 1}
+                    />
                   )}
                 </div>
               ))}
 
               {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
-                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-black/30 rounded-full animate-bounce [animation-delay:300ms]" />
-                  </div>
+                <div className="flex justify-start pl-1">
+                  <p className="text-sm text-black/40 italic animate-pulse">{loadingPhrase}</p>
                 </div>
               )}
               <div ref={bottomRef} />
@@ -193,7 +244,36 @@ export default function PortfolioAgent() {
           </button>
         </form>
 
-        {!loading && lastSuggestions.length > 0 && (
+        {hasStarted && (
+          <div className="mt-8 -ml-4" style={{ height: "84px", overflow: "hidden" }}>
+            {loading ? (
+              /* Shimmer placeholders — 2 rows, fixed height */
+              <div className="flex flex-wrap gap-3">
+                {[220, 260, 190].map((w, i) => (
+                  <div
+                    key={i}
+                    className="h-[34px] rounded-full bg-black/10 animate-pulse"
+                    style={{ width: `${w}px` }}
+                  />
+                ))}
+              </div>
+            ) : lastSuggestions.length > 0 ? (
+              <div className="flex flex-wrap gap-3">
+                {lastSuggestions.map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => ask(prompt)}
+                    className="text-xs font-medium px-4 py-2 rounded-full border border-black/20 text-black/70 hover:border-[#fe6500] hover:text-[#fe6500] transition-colors"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        )}
+
+        {!hasStarted && lastSuggestions.length > 0 && (
           <div className="flex flex-wrap gap-3 mt-8 -ml-4">
             {lastSuggestions.map((prompt) => (
               <button
