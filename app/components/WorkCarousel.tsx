@@ -138,8 +138,8 @@ export default function WorkCarousel() {
         {/* Carousel wrapper — capped at 3-card width so right arrow aligns with last card */}
         <div className="relative max-w-[1008px]">
 
-          {/* Left arrow — centered vertically on the card image area */}
-          <div className="absolute left-0 top-[45%] -translate-y-1/2 -translate-x-1/2 z-10">
+          {/* Left arrow — hidden on mobile, visible on md+ */}
+          <div className="hidden md:block absolute left-0 top-[45%] -translate-y-1/2 -translate-x-1/2 z-10">
             <ArrowButton direction="left" onClick={prev} disabled={active === 0} />
           </div>
 
@@ -180,8 +180,8 @@ export default function WorkCarousel() {
             ))}
           </div>
 
-          {/* Right arrow */}
-          <div className="absolute right-0 top-[45%] -translate-y-1/2 translate-x-1/2 z-10">
+          {/* Right arrow — hidden on mobile, visible on md+ */}
+          <div className="hidden md:block absolute right-0 top-[45%] -translate-y-1/2 translate-x-1/2 z-10">
             <ArrowButton direction="right" onClick={next} disabled={active >= CARDS.length - 3} />
           </div>
 
